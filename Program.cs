@@ -1,8 +1,12 @@
+using RestWithASPNET10Study.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
+
+builder.Services.AddSingleton<MathService>();
 
 var app = builder.Build();
 

@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using RestWithASPNET10Study.Services;
+using RestWithASPNET10Study.Utils;
 
 namespace RestWithASPNET10Study.Controllers
 {
@@ -6,12 +8,21 @@ namespace RestWithASPNET10Study.Controllers
     [Route("[controller]")]
     public class MathController : ControllerBase
     {
+        private readonly MathService _service;
+
+        public MathController(MathService service)
+        {
+            _service = service;
+        }
+
         [HttpGet("sum/{firstNumber}/{secondNumber}")]
         public IActionResult Sum(string firstNumber, string secondNumber)
         {
-            if (IsNumeric(firstNumber) && IsNumeric(secondNumber))
+            if (NumberHelper.IsNumeric(firstNumber) && NumberHelper.IsNumeric(secondNumber))
             {
-                var sum = ConvertToDecimal(firstNumber) + ConvertToDecimal(secondNumber);
+                var sum = _service.Sum(
+                    NumberHelper.ConvertToDecimal(firstNumber),
+                    NumberHelper.ConvertToDecimal(secondNumber));
                 return Ok(sum);
             }
             return BadRequest("Invalid Input!");
@@ -20,9 +31,12 @@ namespace RestWithASPNET10Study.Controllers
         [HttpGet("media/{firstNumber}/{secondNumber}")]
         public IActionResult Media(string firstNumber, string secondNumber)
         {
-            if (IsNumeric(firstNumber) && IsNumeric(secondNumber))
+            if (NumberHelper.IsNumeric(firstNumber) && NumberHelper.IsNumeric(secondNumber))
             {
-                var media = (ConvertToDecimal(firstNumber) + ConvertToDecimal(secondNumber)) / 2;
+                var media = _service.Media(
+                    NumberHelper.ConvertToDecimal(firstNumber),
+                    NumberHelper.ConvertToDecimal(secondNumber)
+                    );
                 return Ok(media);
             }
             return BadRequest("Invalid Input");
@@ -32,39 +46,17 @@ namespace RestWithASPNET10Study.Controllers
         [HttpGet("square/{number}")]
         public IActionResult Square(string number)
         {
-            if (IsNumeric(number))
+            if (NumberHelper.IsNumeric(number))
             {
-                var sqrt = Math.Sqrt((double)ConvertToDecimal(number));
+                var sqrt = _service.Square(
+                    NumberHelper.ConvertToDecimal(number)
+                );
                 return Ok(sqrt);
             }
             return BadRequest("Invalid Input");
         }
 
-        private decimal ConvertToDecimal(string strNumber)
-        {
-            decimal decimalValue;
-            if (decimal.TryParse(strNumber,
-                System.Globalization.NumberStyles.Any,
-                System.Globalization.NumberFormatInfo.InvariantInfo,
-                out decimalValue)
-                )
-            {
-                return decimalValue;
-            }
-            return 0;
-        }
-
-        private bool IsNumeric(string strNumber)
-        {
-            decimal decimalValue;
-            bool isNumber = decimal.TryParse(
-                strNumber,
-                System.Globalization.NumberStyles.Any,
-                System.Globalization.NumberFormatInfo.InvariantInfo,
-                out decimalValue
-                );
-            return isNumber;
-        }
+        
 
 
     }
